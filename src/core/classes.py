@@ -1,15 +1,3 @@
-"""Class taxonomy: model labels to canonical Indian-road classes and categories.
-
-A detector emits whatever labels its weights were trained on. COCO calls a
-pedestrian ``person``; a custom Indian-road model may call an auto-rickshaw
-``auto``, ``autorickshaw`` or ``three-wheeler``. Everything downstream reasons
-about *canonical* class names and :class:`SemanticCategory`, so this module is
-the single place that has to change when new weights are plugged in.
-
-Adding a class requires one alias entry and one category entry - no changes to
-the tracker, risk engine, or decision engine.
-"""
-
 from __future__ import annotations
 
 import re
@@ -29,13 +17,9 @@ __all__ = [
 ]
 
 
-# ---------------------------------------------------------------------------
-# Alias table: any label a model might emit -> canonical class name.
-# Keys are matched after lower-casing and collapsing separators.
-# ---------------------------------------------------------------------------
 
 _ALIASES: Final[dict[str, str]] = {
-    # --- road users -------------------------------------------------------
+    # road users
     "person": "person",
     "pedestrian": "person",
     "people": "person",
@@ -66,7 +50,7 @@ _ALIASES: Final[dict[str, str]] = {
     "train": "train",
     "boat": "unknown",
     "airplane": "unknown",
-    # --- animals ----------------------------------------------------------
+    # animals
     "cow": "cow",
     "cattle": "cow",
     "buffalo": "cow",
@@ -83,7 +67,7 @@ _ALIASES: Final[dict[str, str]] = {
     "zebra": "other_animal",
     "giraffe": "other_animal",
     "animal": "other_animal",
-    # --- Indian-specific slow movers -------------------------------------
+    # Indian-specific slow movers
     "bullock_cart": "bullock_cart",
     "bullockcart": "bullock_cart",
     "bullock": "bullock_cart",
@@ -93,7 +77,7 @@ _ALIASES: Final[dict[str, str]] = {
     "handcart": "pushcart",
     "thela": "pushcart",
     "vendor_cart": "pushcart",
-    # --- hazards ----------------------------------------------------------
+    # hazards
     "pothole": "pothole",
     "potholes": "pothole",
     "pot_hole": "pothole",
@@ -116,7 +100,7 @@ _ALIASES: Final[dict[str, str]] = {
     "cone": "traffic_cone",
     "traffic_cone": "traffic_cone",
     "drum": "traffic_cone",
-    # --- signage ----------------------------------------------------------
+    # signage
     "traffic_light": "traffic_light",
     "trafficlight": "traffic_light",
     "signal": "traffic_light",
@@ -134,10 +118,6 @@ _ALIASES: Final[dict[str, str]] = {
     "unknown_obstacle": "unknown",
 }
 
-
-# ---------------------------------------------------------------------------
-# Canonical class -> semantic category.
-# ---------------------------------------------------------------------------
 
 _CATEGORIES: Final[dict[str, SemanticCategory]] = {
     "person": SemanticCategory.VULNERABLE,
@@ -205,12 +185,7 @@ def _normalise(label: str) -> str:
 
 
 def canonicalize(label: str) -> str:
-    """Map a raw model label onto a canonical class name.
 
-    Unrecognised labels become ``"unknown"`` rather than being invented into a
-    plausible-sounding class. The system must never hallucinate a class it was
-    not trained to produce.
-    """
     key = _normalise(label)
     if key in _ALIASES:
         return _ALIASES[key]

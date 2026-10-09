@@ -1,11 +1,3 @@
-"""Typed, validated configuration loaded from YAML.
-
-Every tunable threshold in the system lives in ``configs/*.yaml`` and is parsed
-into the Pydantic models below. Validation happens once at startup so a typo in
-a config file fails loudly and immediately rather than producing a subtly wrong
-risk assessment ten minutes into a video.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -21,12 +13,9 @@ DEFAULT_CONFIG_PATH = Path("configs/default.yaml")
 
 
 class _Base(BaseModel):
-    """Base model: reject unknown keys so config typos cannot pass silently."""
 
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
-
-# ---------------------------------------------------------------------------
 
 
 class AppConfig(_Base):
@@ -105,7 +94,6 @@ class DistanceConfig(_Base):
     object_dimensions: dict[str, ObjectDimension] = Field(default_factory=dict)
 
     def dimension_for(self, class_name: str) -> ObjectDimension:
-        """Dimensions for a class, falling back to the ``unknown`` entry."""
         dim = self.object_dimensions.get(class_name)
         if dim is not None:
             return dim
@@ -237,11 +225,7 @@ class Config(_Base):
 
 
 def load_config(path: str | Path | None = None) -> Config:
-    """Load and validate a YAML config.
 
-    Falls back to built-in defaults when no file is supplied or found, so the
-    application still runs on a fresh checkout.
-    """
     if path is None:
         path = DEFAULT_CONFIG_PATH
     cfg_path = Path(path)
@@ -267,7 +251,7 @@ def load_config(path: str | Path | None = None) -> Config:
 
 
 def apply_overrides(config: Config, overrides: dict[str, Any]) -> Config:
-    """Apply dotted-key CLI overrides, e.g. ``{"detector.confidence": 0.5}``."""
+    """Apply dotted-key CLI overrides, e.g. ``{"detector.confidence": 0.5}``."""    
     for dotted, value in overrides.items():
         if value is None:
             continue
