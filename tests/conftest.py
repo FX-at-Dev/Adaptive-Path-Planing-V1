@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+python -c "from src.geometry.road_position import RoadPositionAnalyzer"
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.core.config import Config, load_config
